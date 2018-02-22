@@ -41,7 +41,7 @@ Variables names can be any numeric value. For example `a` returns `97`, so `a=31
 | `(` | Evaluate | Push right with a new instance of left | Ditte |
 | `?` | If | If left is non-zero, continue. Otherwise skip to the next `:`. | If right is non-zero, continue. Otherwise skip to the next `:` |
 | `{` | Do while | Execute the right code until it returns 0. Return a list of the values returned by each loop | Ditto |
-| `;)}>` | End Evaluation | Return left | Push 0 and return |
+| `:;)}>`, EOF | End Evaluation | Return left | Push 0 and return |
 | whitespace | Ignored | Ignored. Used to break up numbers. | Ditto |
 
 
