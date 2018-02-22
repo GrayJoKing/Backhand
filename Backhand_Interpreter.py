@@ -112,13 +112,6 @@ class Backhand_Interpreter():
 				'value'		: i-ord('0')
 			}
 
-		#Declare character constants
-		for i in list(range(ord('a'), ord('z')+1)) + list(range(ord('A'), ord('Z')+1)):
-			self.constants[i] = {
-				'function'	: self.character,
-				'value'		: i
-			}
-
 		#Arithemetic
 		self.constants[ord("/")] = {
 			'function'	: self.divide,
@@ -161,11 +154,11 @@ class Backhand_Interpreter():
 			'value'		: ord("i")
 		}
 		self.constants[ord("o")] = {
-			'function'	: lambda left, value: self.asciiOut(left) if left else self.asciiOut(self.evaluate()),
+			'function'	: lambda left, value: self.evaluate(self.asciiOut(left)) if left else self.asciiOut(self.evaluate()),
 			'value'		: ord("o")
 		}
 		self.constants[ord("n")] = {
-			'function'	: lambda left, value: self.intOut(left) if left else self.intOut(self.evaluate()),
+			'function'	: lambda left, value: self.evaluate(self.intOut(left)) if left else self.intOut(self.evaluate()),
 			'value'		: ord("n")
 		}
 		self.constants[ord("b")] = {
@@ -174,18 +167,11 @@ class Backhand_Interpreter():
 		}
 
 		#No-ops
-		self.constants[ord(" ")] = {
-			'function'	: lambda left, value: self.evaluate(left),
-			'value'		: ord(" ")
-		}
-		self.constants[ord("\n")] = {
-			'function'	: lambda left, value: self.evaluate(),
-			'value'		: ord("\n")
-		}
-		self.constants[ord("\t")] = {
-			'function'	: lambda left, value: self.evaluate(left),
-			'value'		: ord("\t")
-		}
+		for x in " \t\n\r":
+			self.constants[ord(x)] = {
+				'function'	: self.evaluate,
+				'value'		: ord(x)
+			}
 
 		#Control flow
 		self.constants[ord("<")] = {
@@ -255,7 +241,6 @@ class Backhand_Interpreter():
 	def multiply(self, left, value):
 		if left:
 			temp = self.evaluate()
-			if len(temp) != 1 and len(left) != 1: raise("Error: List multiplied by list")
 			left.append(left.pop()*temp.pop())
 			return left
 		else:
@@ -276,11 +261,11 @@ class Backhand_Interpreter():
 	def brack(self, left, value):
 		return self.character(left, self.evaluate())
 
-	def evaluate(self, left=None):
+	def evaluate(self, left=None, value=None):
 		if left == None: left = []
 		if self.step: input()
 		self.IP += 1
-		if self.IP >= len(self.code): return left if left else 0
+		if self.IP >= len(self.code): return left if left else [0]
 		return self.execute(ord(self.code[self.IP]), left)
 
 	def execute(self, value, left):
@@ -336,7 +321,7 @@ class Backhand_Interpreter():
 		while temp and temp != value:
 			left.append(temp)
 			temp = self.get()
-		if self.debug: sys.stderr.write('Pushed string ' + str(left))
+		if self.debug: sys.stderr.write('Pushed string ' + str(left) + "\n")
 		return self.evaluate(left)
 
 	def loop(self, left, value):
@@ -344,13 +329,13 @@ class Backhand_Interpreter():
 		if type(left) is not list: left = [left]
 		here = self.IP
 		temp = self.evaluate()
-		if self.debug: sys.stderr.write("Loop value " + str(temp))
+		if self.debug: sys.stderr.write("Loop value " + str(temp) + "\n")
 		while temp and (type(temp) != list or len(temp) != 1 or temp[0]):
 			left += temp
 			self.IP = here
 			temp = self.evaluate()
-			if self.debug: sys.stderr.write("Loop value " + str(temp))
-		if self.debug: sys.stderr.write("Loop ended and returned" + str(left))
+			if self.debug: sys.stderr.write("Loop value " + str(temp) + "\n")
+		if self.debug: sys.stderr.write("Loop ended and returned" + str(left) + "\n")
 		return left
 
 	def asciiIn(self):
@@ -390,16 +375,16 @@ class Backhand_Interpreter():
 		return num*sign
 
 
-'''
+
 if __name__ == "__main__":
 	program = open(__import__("sys").argv[1], "r").read()
 	Backhand_Interpreter(program)
-'''
 
+"""
 debugMode = 0
 
-Backhand_Interpreter('a=";o*a(=34a34a";o*a(=34a34a',inp='',debug=debugMode,step=debugMode)
-
+Backhand_Interpreter('{n*0=0+!<o5+5',inp='',debug=debugMode,step=debugMode)
+"""
 """
 Countdown from 10
 a=11;n{*a=a-1
