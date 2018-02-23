@@ -1,95 +1,11 @@
 import sys
 import math
 
-##0-9 (aliases for actual numbers)
-#If left argument:
-	#eval right(left*10 + self)
-#Else
-	#Return 0-9
-
-#A-Z and a-z
-#If left argument:
-	# return eval(left.append(self))
-#Else
-	#Return eval(self)
-
-##= (set)
-#If left argument:
-	#Set left variable to eval(right)
-	#return right
-#Else:
-	#Return self
-
-##/+-% (arithemetic)
-#If left argument
-	#Return left arithmetic eval(right)
-#Else
-	#Return self
-
-##* (multiply or pointer)
-#If left argument
-	#Return left*eval(right)
-#else
-	#return next character
-
-##! (not)
-#If left:
-	#return factorial(left)
-#else:
-	#return not eval(right)
-
-##;
-#If left argument
-	#Return left argument
-#Else
-	#Return self
-
-##i (input)
-#If input:
-	#Return a byte of input
-#else:
-	##return 0
-
-##o (output)
-#if left argument:
-	#return value of o
-#else
-	#Evaluate right and output it
-	#Return right
-
-##? (if statement)
-#If left argument:
-	#If left != 0
-		#return eval right
-	#else
-		#eval right without executing anything and return 0
-#else
-	#if eval right:
-		#return eval right
-	#else:
-		#eval right without executing anything and return 0
-
 ##r (random)
 #if left:
 	#return random number between left and right()
 #else:
 	#return a random element of the right() list
-
-# space tab newline (no-ops)
-##ignore them unless an * is in front
-
-#{ (while loop)
-#if left:
-	#repeat loop while left variable is true
-#else:
-	#skip back to here if right() is true
-
-#< (eval and return 0)
-#right() and right(left)
-
-#( (eval)
-#return right()
-
 
 class Backhand_Interpreter():
 	def __init__(self, code, inp = '', inputFlag = 'preset', debug=False, step=False):
