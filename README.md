@@ -1,6 +1,6 @@
 # Backhand
 
-Backhand is an esotoric language with an unusual program flow, inspired by 2D languages, such as Befunge and `><>`.
+Backhand is an esoteric language with an unusual program flow, inspired by 2D languages, such as Befunge and `><>`.
 
 Backhand is a 1D language, so most programs are interpreted as a series of characters. The origin of the name comes from "Back and Forth", since to get the most out of the code, the instruction pointer has to go back and forth. Initially, the pointer will start at the first character and move 3 steps at a time. For example: `1  1  +  O  @` will add 1 + 1 and output 2 before terminating.
 
@@ -45,7 +45,7 @@ Similar to Brain-Flak, Backhand uses two separate stacks. You usually operate on
 |              | `^` | Increment Step | Increase the step value by 1 |
 |              | `v` | Decrement Step | Decrease the step value by 1 |
 |              | `_` | Decision Step | Pop `a` and if `a` is zero step right, else step left |
-|              | `|` | Decision Change | Pop `a` and if `a` is not zero reverse direction |
+|              | `\|` | Decision Change | Pop `a` and if `a` is not zero reverse direction |
 |              | `?` | Random | Step left or right randomly |
 |              | `j` | Jump | Pop `a` and jump to the `a`th character, bouncing off the sides as usual. `0` is the first character |
 |              | `@` | Terminate | End the program |
@@ -89,7 +89,7 @@ aO0{@|}}:
 `1@ IO :~!{|{}: ([ *).`
 
 ### Quine:
-`"  v < ^:3+fb+v}< [o:$}| @`
+`"#v{<@^:[ba+0v|{$:o[}`
 
 ### Printing Backhand
 `"acdBkn"haH`

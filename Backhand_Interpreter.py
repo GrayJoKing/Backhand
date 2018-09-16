@@ -167,7 +167,7 @@ if __name__ == "__main__":
 		program = open(sys.argv[1], "r").read()
 		i = Backhand_Interpreter(program)
 	else:
-		i = Backhand_Interpreter('aO0{@|}}:\n.O[.')
+		i = Backhand_Interpreter('')
 		i.debug = True
 	while i.run(): i.changePointer(i.step*i.dir, False)
 
@@ -187,14 +187,14 @@ Truth Machine:
 I|@}:  O
 
 Quine:
-"  v < ^:3+fb+v}< [o:$}| @
+"#v{<@^:[ba+0v|{$:o[}
 
 Countdown from 10
 aO0{@|}}:
  O[
 
 Count up forever
-]{O: 
+]{O:
 
 Factorial
 1@ IO :~!{|{}: ([ *)
