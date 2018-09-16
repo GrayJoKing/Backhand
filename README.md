@@ -1,68 +1,95 @@
 # Backhand
 
-Backhand is an esotoric language with an unusual program flow, where instructions will be evaluated left to right, but only executed right to left. For example, take the short program:
+Backhand is an esotoric language with an unusual program flow, inspired by 2D languages, such as Befunge and `><>`.
 
-`n5+n1`
+Backhand is a 1D language, so most programs are interpreted as a series of characters. The origin of the name comes from "Back and Forth", since to get the most out of the code, the instruction pointer has to go back and forth. Initially, the pointer will start at the first character and move 3 steps at a time. For example: `1  1  +  O  @` will add 1 + 1 and output 2 before terminating.
 
-`n` is the print number instruction, returning that number afterwards. This program prints the `1` first, before adding it to the 5 and printing a `6`. This becomes more obvious with something like:
+If the pointer is about to step out of bounds, it reverses direction. Using this, `1O.1+@` is the same program as before. The program evaluation goes like so:
 
-`n5+4-3*2/1`
+```
+1  1     Bounce off end and go left
+ O  +    Bounce off start and go right
+  .  @   End
+```
 
-Where the operaters are executed from right to left, printing `3`.
+This can lead to some very compressed programs folding in on themselves, like `"ol!,ld elWHro"` printing `Hello, World!`.
 
-## Data types
-There is only one data type in Backhand, lists of number. However, a list with only one element is often treated as a single integer, and most operators will act on the last element of the list. Sometimes it's easier to think of it as a stack.
+But if you want to decrease the step count of the pointer, you can with `v`. `v v"!dlroW ,olleH"H` Decreases the step count to 1 and then print `Hello, World!`. If you want to go the other way, you can use `^` to increase the pointer steps. Note that if you decrease the step count to negative then directionals like `<>` will have the opposite effect.
 
-## Behaviour
-Many operators will behave differently whether or not there is data to the left of it. For example, the `!` operator will return the factorial of the left data, but will return the boolean NOT of the right if there is no data. If an operator doesn't have a function for that situation it will just return the value of itself.
 
-## Variables
-Variables names can be any numeric value. For example `a` returns `97`, so `a=31` will set `a` to `31`. However, calling `a` from now on will return the value `31`, so `a=97` will not restore `a`, but sets `37` to `97`. You'll need the `*` operator to make sure you're actually fetching the original value of `a`, where `*a=97` is the correct version of this. 
 
-**Warning: you can set operators to values.** For example, `*5=1` will set the value of `5` to `1`, meaning something like `1+5` will now return `2` instead of `6`. Even worse, you can reassign the `=` operator itself, e.g. `*==0`, which really ruins your day. Any operators set in this manner will be lost *forever*, so be careful!
+## Data structure
+
+Similar to Brain-Flak, Backhand uses two separate stacks. You usually operate on the main stack, but you can pull/push to the other stack with `(`/`)`, or even switch stacks with `x`. Attempting to pop from an empty stack yields a `0` instead.
+
 
 ## Operators
 
-| Character | Use |  With left | With right |
+| Group | Character | Name | Action |
 |---|---|---|---|
-| `0-9` | Number literals | If number mode is active, it multiplies the previous value by 10 and adds itself to it. Otherwise it just appends itself to the list. Either way, it activates number mode and continues right. Number mode is deactivated when a non-number is reached. | Ditto |
-| `-` | Subtraction/Negation | Return left - right | Return -right |
-| `+` | Addition | Return left + right | Push "+" to left |
-| `/` | Division | Return left / right (integer division) | Push "/" to left |
-| `%` | Modulo | Return left % right | Push "%" to left |
-| `*` | Multiplication/Fetch | Return left * right | Push the ASCII value of the next character to left. EOF is treated as 0. |
-| `=` | Set | Set the data at left to right |  Push "=" to left |
-| `"` | String | Push the ASCII value of each character until it reaches either another `"` or EOF | Ditto |
-| `i` | ASCII input | Push the next byte of input | Ditto |
-| `o` | ASCII output | Print left as ASCII | Print right as ASCII |
-| `n` | Number input | Ignore data until it reaches a `-`, `+` or a number and push that number | Ditto |
-| `b` | Number output | Print left as space separated numbers | Print right as space separated numbers |
-| `<` | Evaluate without pushing | Evaluate right without affecting left | Ditto |
-| `(` | Evaluate | Push right with a new instance of left | Ditte |
-| `?` | If | If left is non-zero, continue. Otherwise skip to the next `:`. | If right is non-zero, continue. Otherwise skip to the next `:` |
-| `{` | Do while | Execute the right code until it returns 0. Return a list of the values returned by each loop | Ditto |
-| `:;)}>`, EOF | End Evaluation | Return left | Push 0 and return |
-| whitespace | Ignored | Ignored. Used to break up numbers. | Ditto |
+| Literals | `0-9a-f` | Number literal | Pushs the appropriate number. `a-f` Push the values `10`-`15` |
+|          | `"`      | String literal | Turn on string mode, which pushes the ASCII value of each character until it reaches either another `"` |
+| Stack manipulation | `~` | Pop     | Pop and discard `a` |
+|                    | `$` | Swap    | Pop `a` then `b` and push `a` then `b` |
+|                    | `:` | Dupe    | Pop `a` push `a` twice |
+|                    | `&` | Register | If there is not a value in the register, pop `a` and store `a` in the register. Otherwise, push the value in the register and clear it |
+|                    | `r` | Reverse | Reverse the stack |
+|                    | `l` | Length  | Push the length of the stack |
+|                    | `(` | Pull    | Pop `a` from the other stack and push `a` |
+|                    | `)` | Push    | Pop `a` and push `a` to the other stack |
+|                    | `x` | Switch  | Swap the main and other stack |
+| Control Flow | `<` | Left  | Change direction to left |
+|              | `>` | Right | Change direction to right |
+|              | `{` | Step Left | Step left one |
+|              | `}` | Step Right | Step right one |
+|              | `^` | Increment Step | Increase the step value by 1 |
+|              | `v` | Decrement Step | Decrease the step value by 1 |
+|              | `_` | Decision Step | Pop `a` and if `a` is zero step right, else step left |
+|              | `|` | Decision Change | Pop `a` and if `a` is not zero reverse direction |
+|              | `?` | Random | Step left or right randomly |
+|              | `j` | Jump | Pop `a` and jump to the `a`th character, bouncing off the sides as usual. `0` is the first character |
+|              | `@` | Terminate | End the program |
+| Arithmetic | `-` | Subtraction    | Pop two values `a` then `b` and push `b-a` |
+|            | `+` | Addition       | Pop two values `a` then `b` and push `b-a` |
+|            | `*` | Multiplication | Pop two values `a` then `b` and push `b*a` |
+|            | `/` | Division       | Pop two values `a` then `b` and push `b//a`, the integer division of `b` and `a` |
+|            | `%` | Modulo         | Pop two values `a` then `b` and push `b%a`, where the sign of the result matches the sign of `a` |
+|            | `!` | Not            | Pop `a` and push whether `a` is equal to `0` |
+|            | `[` | Decrement      | Pop `a` and push `a-1` |
+|            | `]` | Increment      | Pop `a` and push `a+1` |
+| Input/Output | `i`  | ASCII input | Push the next byte of input |
+|              | `o`  | ASCII output | Pop `a` and output `a` as ASCII |
+|              | `I`  | Number input | Ignore input data until it reaches a number and push that number. If the number is preceeded by a `-` then the number is negative. |
+|              | `O`  | Number output | Pop `a` and print `a` as a number |
+|              | `\n` | Newline | Print a newline |
+|              | `H`  | Halt | Print the contents of the stack and halt the program |
 
 
 ## Example programs:
 
 ### Countdown from 10
-`a=11;n{*a=a-1`
+```
+aO0{@|}}:
+.O[.
+```
 
 ### Hello, World!
-`o"Hello, World!`
+`"ol!,ld elWHro"`
 
 ### Cat program
-`o{i` for non-infinite streams
-`{oi` for infinite
+`io`
+
+### Truth Machine
+`I|@}:  O`
 
 ### Count up forever:
-`{n*0=0+!!o5+5`
+`]{O:.`
 
 ### Factorial:
-`nb!`
+`1@ IO :~!{|{}: ([ *).`
 
 ### Quine:
-`a=";o*a61 34a34a";o*a(=34a34a`
+`"  v < ^:3+fb+v}< [o:$}| @`
 
+### Printing Backhand
+`"acdBkn"haH`
