@@ -61,6 +61,8 @@ class Backhand_Interpreter():
 		self.debug = False
 		self.register = None
 
+	def tick(self):i.changePointer(i.step*i.dir, False)
+
 	def changePointer(self, num, evl = True):
 		self.pointer += num
 		check = True
@@ -115,49 +117,72 @@ class Backhand_Interpreter():
 		if self.quote:
 			if c == '"': self.quote = False
 			else: self.main.push(ord(c))
+			
+		# Literals
 		elif c in '0123456789abcdef': self.push('0123456789abcdef'.index(c))
-		elif c == '@': return False
-		elif c == 'H': return 0*sys.stdout.write(''.join(self.main.stringify()))
 		elif c == '"': self.quote = True
-		elif c == '<': self.dir = -1
-		elif c == '>': self.dir = 1
-		elif c == '{': self.changePointer(-1)
-		elif c == '}': self.changePointer(1)
-		elif c == '[': self.push(self.pop()-1)
-		elif c == ']': self.push(self.pop()+1)
-		elif c == '(': self.push(self.other.pop())
-		elif c == ')': self.other.push(self.pop())
-		elif c == 'x': self.main, self.other = self.other, self.main
-		elif c in '*/%+-':
-			if c == '/': c = '//'
-			a,b = str(self.pop()), str(self.pop())
-			self.push(eval(b+c+a))
-		elif c == '!': self.push(int(not self.pop()))
+		elif c == "'":
+			self.tick()
+			self.push(ord(self.code[self.pointer]))
+		
+		# Stack manipulation
 		elif c == '~': self.pop()
-		elif c == ':': self.push([self.pop()]*2)
 		elif c == '$': self.push([self.pop(), self.pop()])
-		elif c == 'r': self.main.stack = self.main.stack[::-1]
-		elif c == 'l': self.push(len(self.main.stack))
-		elif c == '\n':print()
-		elif c == 'i': self.push(self.getChar())
-		elif c == 'o': sys.stdout.write(chr(self.pop()))
-		elif c == 'I': self.push(self.getNumber())
-		elif c == 'O': sys.stdout.write(str(self.pop()))
-		elif c == 'j':
-			self.pointer = 0
-			self.dir = 1
-			self.changePointer(self.pop())
-		elif c == '^': self.step += 1
-		elif c == 'v': self.step -= 1
-		elif c == '?': self.changePointer(random.choice([-1,1]))
-		elif c == '_': self.changePointer(-1 if self.pop() else 1)
-		elif c == '|': self.dir = -self.dir if self.pop() else self.dir
+		elif c == ':': self.push([self.pop()]*2)
 		elif c == '&':
 			if self.register != None:
 				self.push(self.register)
 				self.register = None
 			else:
 				self.register = self.pop()
+		elif c == 'r': self.main.stack = self.main.stack[::-1]
+		elif c == 'l': self.push(len(self.main.stack))
+		elif c == '(': self.push(self.other.pop())
+		elif c == ')': self.other.push(self.pop())
+		elif c == 'x': self.main, self.other = self.other, self.main
+		
+		# Control Flow
+		elif c == '<': self.dir = -1
+		elif c == '>': self.dir = 1
+		elif c == '{': self.changePointer(-1)
+		elif c == '}': self.changePointer(1)
+		elif c == '^': self.step += 1
+		elif c == 'M': self.step += 2
+		elif c == 'v': self.step -= 1
+		elif c == 'W': self.step -= 2
+		elif c == '?': self.changePointer(random.choice([-1,1]))
+		elif c == 'j':
+			self.pointer = 0
+			self.dir = 1
+			self.changePointer(self.pop())
+		elif c == 's': 
+			self.changePointer(self.pop()*self.dir)
+		elif c == '@': return False
+		
+		# Branching
+		elif c == '_': self.changePointer(-1 if self.pop() else 1)
+		elif c == '|': self.dir = -self.dir if self.pop() else self.dir
+		elif c == '!': self.push(int(not self.pop()))
+		elif c == 'L': self.push(int(self.pop() < self.pop()))
+		elif c == 'G': self.push(int(self.pop() > self.pop()))
+		elif c == 'E': self.push(int(self.pop() == self.pop()))
+		
+		# Arithmetic
+		elif c in '*/%+-':
+			if c == '/': c = '//'
+			a,b = str(self.pop()), str(self.pop())
+			self.push(eval(b+c+a))
+		elif c == '[': self.push(self.pop()-1)
+		elif c == ']': self.push(self.pop()+1)
+		
+		# IO
+		elif c == 'i': self.push(self.getChar())
+		elif c == 'o': sys.stdout.write(chr(self.pop()))
+		elif c == 'I': self.push(self.getNumber())
+		elif c == 'O': sys.stdout.write(str(self.pop()))
+		elif c == '\n':print()
+		elif c == 'H': return 0*sys.stdout.write(''.join(self.main.stringify()))
+		elif c == 'h': return 0*sys.stdout.write(str(self.pop()))
 
 		return True
 
@@ -166,10 +191,10 @@ if __name__ == "__main__":
 	if len(sys.argv) > 1:
 		program = open(sys.argv[1], "r").read()
 		i = Backhand_Interpreter(program)
-	else:
-		i = Backhand_Interpreter('')
-		i.debug = True
-	while i.run(): i.changePointer(i.step*i.dir, False)
+	#else:
+		#i = Backhand_Interpreter('"ol!,ld elWHro"')
+		#i.debug = True
+		while i.run(): i.tick()
 
 """
 Examples:

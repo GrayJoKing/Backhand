@@ -28,12 +28,13 @@ Similar to [Brain-Flak](https://github.com/DJMcMayhem/Brain-Flak), Backhand uses
 | Group | Character(s) | Name | Action |
 |---|---|---|---|
 | Literals |  |  |
-|          | `0-9a-f` | Number literal | Pushs the appropriate number. The characters `a` to `f` push the values `10` to `15` |
-|          | `"`      | String literal | Turn on string mode, which pushes the ASCII value of each character until it reaches either another `"` |
+|          | `0-9a-f` | Number | Pushs the appropriate number. The characters `a` to `f` push the values `10` to `15` |
+|          | `"`      | String | Turn on string mode, which pushes the ASCII value of each character until it reaches either another `"` |
+|          | `'`      | Character | Push the ordinal value of the next instruction instead of executing it |
 | Stack manipulation |  |  |
 |                    | `~` | Pop     | Pop and discard `a` |
 |                    | `$` | Swap    | Pop `a` then `b` and push `a` then `b` |
-|                    | `:` | Dupe    | Pop `a` push `a` twice |
+|                    | `:` | Dupe    | Pop `a` then push `a` twice |
 |                    | `&` | Register | If there is not a value in the register, pop `a` and store `a` in the register. Otherwise, push the value in the register and clear it |
 |                    | `r` | Reverse | Reverse the stack |
 |                    | `l` | Length  | Push the length of the stack |
@@ -46,19 +47,26 @@ Similar to [Brain-Flak](https://github.com/DJMcMayhem/Brain-Flak), Backhand uses
 |              | `{` | Step Left | Step left one |
 |              | `}` | Step Right | Step right one |
 |              | `^` | Increment Step | Increase the step value by 1 |
+|              | `M` | Double Increment Step | Increase the step value by 2 |
 |              | `v` | Decrement Step | Decrease the step value by 1 |
-|              | `_` | Decision Step | Pop `a` and if `a` is zero step right, else step left |
-|              | `\|` | Decision Change | Pop `a` and if `a` is not zero reverse direction |
+|              | `W` | Double Decrement Step | Decrease the step value by 2 |
 |              | `?` | Random | Step left or right randomly |
-|              | `j` | Jump | Pop `a` and jump to the `a`th character, bouncing off the sides as usual. `0` is the first character |
+|              | `j` | Jump | Pop `a` and jump to the `a`th character, bouncing off the sides as usual. `0` represents the first character |
+|              | `s` | Skip | Pop `a` and skip forward `a` characters, bouncing off the sides as usual. This moves forward in the current direction |
 |              | `@` | Terminate | End the program |
+| Branching  |  |  |
+|            | `_` | Decision Step    | Pop `a` and if `a` is zero step right, else step left |
+|            | `\|` | Decision Change | Pop `a` and if `a` is not zero reverse direction |
+|            | `!` | Not     | Pop `a` and push `1` if `a` is equal to `0`, otherwise `0` |
+|            | `L` | Less    | Pop `a` then `b` and push `1` if `a` is less than `b`, otherwise `0` |
+|            | `G` | Greater | Pop `a` then `b` and push `1` if `a` is greater than `b`, otherwise `0` |
+|            | `E` | Equal   | Pop `a` then `b` and push `1` if `a` is equal to `b`, otherwise `0` |
 | Arithmetic |  |  |
 |            | `-` | Subtraction    | Pop two values `a` then `b` and push `b-a` |
 |            | `+` | Addition       | Pop two values `a` then `b` and push `b-a` |
 |            | `*` | Multiplication | Pop two values `a` then `b` and push `b*a` |
 |            | `/` | Division       | Pop two values `a` then `b` and push `b//a`, the integer division of `b` and `a` |
 |            | `%` | Modulo         | Pop two values `a` then `b` and push `b%a`, where the sign of the result matches the sign of `a` |
-|            | `!` | Not            | Pop `a` and push whether `a` is equal to `0` |
 |            | `[` | Decrement      | Pop `a` and push `a-1` |
 |            | `]` | Increment      | Pop `a` and push `a+1` |
 | Input/Output |  |  |
@@ -67,7 +75,8 @@ Similar to [Brain-Flak](https://github.com/DJMcMayhem/Brain-Flak), Backhand uses
 |              | `I`  | Number input | Ignore input data until it reaches a number and push that number. If the number is preceeded by a `-` then the number is negative. |
 |              | `O`  | Number output | Pop `a` and print `a` as a number |
 |              | `\n` | Newline | Print a newline |
-|              | `H`  | Halt | Print the contents of the stack and halt the program |
+|              | `H`  | Halt | Print the contents of the stack as a string and terminate the program |
+|              | `h`  | Finish | Output the top of stack as a number and terminate the program |
 
 Any other character is ignored.
 
