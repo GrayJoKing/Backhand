@@ -172,6 +172,8 @@ if __name__ == "__main__":
 	if len(sys.argv) > 1:
 		program = open(sys.argv[1], "r").read()
 		i = Backhand_Interpreter(program)
+		if not program:
+			i.error("Program cannot be empty")
 		#i.debug = True
 		while i.run(): i.tick()
 
