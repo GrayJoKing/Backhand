@@ -2,7 +2,7 @@
 
 Backhand is an esoteric language with an unusual program flow, inspired by 2D languages, such as Befunge and `><>`.
 
-Backhand is a 1D language, so most programs are interpreted as a series of characters. The origin of the name comes from "Back and Forth", since to get the most out of the code, the instruction pointer has to go back and forth. Initially, the pointer will start at the first character and move 3 steps at a time. For example: `1  1  +  O  @` will add 1 + 1 and output 2 before terminating.
+Backhand is a 1D language, so most programs are interpreted as a series of characters. The origin of the name comes from "Back and Forth", since to get the most out of the code, the instruction pointer has to go back and forth. Initially, the pointer will start at the first character and move 3 steps at a time. For example: <code>1&nbsp;&nbsp;1&nbsp;&nbsp;+&nbsp;&nbsp;O&nbsp;&nbsp;@</code> will add 1 + 1 and output 2 before terminating.
 
 If the pointer is about to step out of bounds, it reverses direction. Using this, `1O.1+@` is the same program as before. The program evaluation goes like so:
 
