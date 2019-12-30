@@ -32,8 +32,8 @@ class Backhand_Interpreter():
 
 	def outputOne(self):
 		o = self.pop()
-		if o > -1: sys.stdout.write(chr(o))
-		else: self.error("Tried to print negative value (%d) as character\n"%o)
+		if -1 < o < 0x110000: sys.stdout.write(chr(o))
+		else: self.error("Tried to print invalid value (%d) as character\n"%o)
 
 	def outputAll(self):
 		while self.main.stack: self.outputOne()
