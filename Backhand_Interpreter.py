@@ -1,33 +1,4 @@
-
-
-"""
-0-f  Push number
-<>   Change direction
-{}   Shift left/right one and execute
-()   Push/pull from other stack
-x    Swap stacks
-*+-/% Arithmetic operators
-~    Pop
-:    Dupe
-$    Swap
-!    Not
-[]   Decrement/increment top of stack
-r    Reverse stack
-l    Push length of stack
-\n   Print a newline
-i/o  Input/Output as char code
-I/O  Input/Output as number
-"    Push values until next "
-j    Jump to the nth instruction
-@    End program
-H    End program and output stack
-^    Increase step
-v    Decrease step
-?    Step left or right randomly
-_    Pop and if zero step right else step left
-|    Pop and if not zero reverse direction
-&    Pop and store/push from register
-"""
+#! /usr/bin/python3
 
 import sys
 import random
@@ -44,8 +15,6 @@ class Stack():
 			for num in nums: self.stack.append(num)
 		else: self.stack.append(nums)
 
-	def stringify(self):
-		return [chr(a)for a in self.stack[::-1]]
 
 class Backhand_Interpreter():
 	def __init__(self, code):
@@ -61,6 +30,14 @@ class Backhand_Interpreter():
 		self.debug = False
 		self.register = None
 
+	def outputOne(self):
+		o = self.pop()
+		if o > -1: sys.stdout.write(chr(o))
+		else: self.error("Tried to print negative value (%d) as character\n"%o)
+
+	def outputAll(self):
+		while self.main.stack: self.outputOne()
+		
 	def tick(self):i.changePointer(i.step*i.dir, False)
 
 	def changePointer(self, num, evl = True):
@@ -87,8 +64,7 @@ class Backhand_Interpreter():
 			self.excessChar = None
 		else:
 			c = sys.stdin.read(1)
-			c = ord(c) if c != '' else -1
-		if c == -1: return -1
+			c = ord(c) if c else -1
 		return c
 
 	def getNumber(self):
@@ -169,59 +145,33 @@ class Backhand_Interpreter():
 		
 		# Arithmetic
 		elif c in '*/%+-':
-			if c == '/': c = '//'
-			a,b = str(self.pop()), str(self.pop())
-			self.push(eval(b+c+a))
+			a,b = self.pop(), self.pop()
+			if c == '/': 
+				c = '//'
+				if a == 0: self.error("Attempted to divide by zero")
+			self.push(eval(str(b)+c+str(a)))
 		elif c == '[': self.push(self.pop()-1)
 		elif c == ']': self.push(self.pop()+1)
 		
 		# IO
 		elif c == 'i': self.push(self.getChar())
-		elif c == 'o': sys.stdout.write(chr(self.pop()))
+		elif c == 'o': self.outputOne()
 		elif c == 'I': self.push(self.getNumber())
 		elif c == 'O': sys.stdout.write(str(self.pop()))
 		elif c == '\n':print()
-		elif c == 'H': return 0*sys.stdout.write(''.join(self.main.stringify()))
-		elif c == 'h': return 0*sys.stdout.write(str(self.pop()))
+		elif c == 'H': return self.outputAll() and False
+		elif c == 'h': return sys.stdout.write(str(self.pop())) and False
 
 		return True
 
+	def error(self, message): 
+		sys.stderr.write(message + "\n")
+		exit(1)
 
 if __name__ == "__main__":
 	if len(sys.argv) > 1:
 		program = open(sys.argv[1], "r").read()
 		i = Backhand_Interpreter(program)
-	#else:
-		#i = Backhand_Interpreter('"ol!,ld elWHro"')
 		#i.debug = True
 		while i.run(): i.tick()
 
-"""
-Examples:
-
-Hello, World!:
-"ol!,ld elWHro"
-
-Add two numbers from stdin:
-IO+I@
-
-Cat Program:
-io
-
-Truth Machine:
-I|@}:  O
-
-Quine:
-"#v{<@^:[ba+0v|{$:o[}
-
-Countdown from 10
-aO0{@|}}:
- O[
-
-Count up forever
-]{O:
-
-Factorial
-1@ IO :~!{|{}: ([ *)
-
-"""
