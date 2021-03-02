@@ -4,23 +4,22 @@ Backhand is an esoteric language with an unusual program flow, inspired by 2D la
 
 Backhand is a 1D language, so most programs are interpreted as a series of characters. The origin of the name comes from "Back and Forth", since to get the most out of the code, the instruction pointer has to go back and forth. Initially, the pointer will start at the first character and move 3 steps at a time. For example: <code>1&nbsp;&nbsp;1&nbsp;&nbsp;+&nbsp;&nbsp;O&nbsp;&nbsp;@</code> will add 1 + 1 and output 2 before terminating.
 
-If the pointer is about to step out of bounds, it reverses direction. Using this, `1O.1+@` is the same program as before. The program evaluation goes like so:
+If the pointer is about to step out of bounds, it reverses direction. You can use this to edit the previous program to the shorter `1O.1+@`. The program evaluation goes like so:
 
 ```
-1  1     Bounce off end and go left
- O  +    Bounce off start and go right
-  .  @   End
+1  1 →   Bounce off end and go left
+←O  +←   Bounce off start and go right
+→ .  @   Output and terminate
 ```
 
 This can lead to some very compressed programs folding in on themselves, like `"ol!,ld elWHro"` printing `Hello, World!`.
 
-But if you want to decrease the step count of the pointer, you can with `v`. The program `v v"!dlroW ,olleH"H` first changes the step count to 1 and then prints `Hello, World!`. If you want to go the other way, you can use `^` to increase the pointer steps. Note that if you decrease the step count to negative then directionals like `<>` will have the opposite effect.
-
+But if you want to decrease the step count of the pointer, you can with `v` or `W`. The program `W"!dlroW ,olleH"H` first changes the step count to 1 and then prints `Hello, World!`. If you want to go the other way, you can use `^` or `M` to increase the pointer steps. Note that if you decrease the step count to negative then not only will the pointer move in the other direction, directionals like `<>` will have the opposite effect.
 
 
 ## Data structure
 
-Similar to [Brain-Flak](https://github.com/DJMcMayhem/Brain-Flak), Backhand uses two separate stacks. You usually operate on the main stack, but you can pull/push to the other stack with `(` or `)`, or even switch stacks with `x`. Attempting to pop from an empty stack yields a `0` instead.
+Similar to [Brain-Flak](https://github.com/DJMcMayhem/Brain-Flak), Backhand uses two separate stacks. You usually operate on the main stack, but you can pull/push to the other stack with `(` or `)`, or even switch stacks with `x`. Attempting to pop from an empty stack will yield a `0` instead.
 
 
 ## Operators
@@ -28,8 +27,8 @@ Similar to [Brain-Flak](https://github.com/DJMcMayhem/Brain-Flak), Backhand uses
 | Group | Character(s) | Name | Action |
 |---|---|---|---|
 | Literals |  |  |
-|          | `0-9a-f` | Number | Pushs the appropriate number. The characters `a` to `f` push the values `10` to `15` |
-|          | `"`      | String | Turn on string mode, which pushes the ASCII value of each character until it reaches either another `"` |
+|          | `0-9a-f` | Number | Pushs the appropriate hexadecimal number. The characters `a` to `f` push the values `10` to `15` |
+|          | `"`      | String | Turn on string mode, which pushes the ordinal value of each character it lands on until it reaches either another `"` |
 |          | `'`      | Character | Push the ordinal value of the next instruction instead of executing it |
 | Stack manipulation |  |  |
 |                    | `~` | Pop     | Pop and discard `a` |
@@ -63,16 +62,16 @@ Similar to [Brain-Flak](https://github.com/DJMcMayhem/Brain-Flak), Backhand uses
 |            | `E` | Equal   | Pop `a` then `b` and push `1` if `a` is equal to `b`, otherwise `0` |
 | Arithmetic |  |  |
 |            | `-` | Subtraction    | Pop two values `a` then `b` and push `b-a` |
-|            | `+` | Addition       | Pop two values `a` then `b` and push `b-a` |
+|            | `+` | Addition       | Pop two values `a` then `b` and push `b+a` |
 |            | `*` | Multiplication | Pop two values `a` then `b` and push `b*a` |
 |            | `/` | Division       | Pop two values `a` then `b` and push `b//a`, the integer division of `b` and `a` |
 |            | `%` | Modulo         | Pop two values `a` then `b` and push `b%a`, where the sign of the result matches the sign of `a` |
 |            | `[` | Decrement      | Pop `a` and push `a-1` |
 |            | `]` | Increment      | Pop `a` and push `a+1` |
 | Input/Output |  |  |
-|              | `i`  | ASCII input | Push the next byte of input |
-|              | `o`  | ASCII output | Pop `a` and output `a` as ASCII |
-|              | `I`  | Number input | Ignore input data until it reaches a number and push that number. If the number is preceeded by a `-` then the number is negative. |
+|              | `i`  | ASCII input | Push the ordinal value of the next character in input. If there is no input left, push `-1` |
+|              | `o`  | ASCII output | Pop `a` and output `a` as a character |
+|              | `I`  | Number input | Ignore input data until it reaches a number and push that number. If the number is preceeded by a `-` then the number is negative. If there is no input left, push `-1` |
 |              | `O`  | Number output | Pop `a` and print `a` as a number |
 |              | `\n` | Newline | Print a newline |
 |              | `H`  | Halt | Print the contents of the stack as a string and terminate the program |
